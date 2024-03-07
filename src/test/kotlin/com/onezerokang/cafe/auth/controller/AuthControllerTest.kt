@@ -4,15 +4,20 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.onezerokang.cafe.auth.dto.request.MemberLoginRequest
 import com.onezerokang.cafe.auth.dto.request.MemberSignupRequest
 import com.onezerokang.cafe.auth.service.AuthService
+import com.onezerokang.cafe.auth.util.JwtUtil
+import com.onezerokang.cafe.member.domain.MemberRepository
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.mockito.BDDMockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -24,6 +29,8 @@ class AuthControllerTest @Autowired constructor(
     private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper,
     @MockBean private val authService: AuthService,
+    @MockBean private val memberRepository: MemberRepository,
+    @MockBean private val jwtUtil: JwtUtil,
 ) {
 
     @DisplayName("회원가입을 할 수 있다.")

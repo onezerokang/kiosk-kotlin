@@ -19,13 +19,13 @@ class AuthController(
     private val authService: AuthService,
 ) {
     @PostMapping("/signup")
-    fun test(@Valid @RequestBody request: MemberSignupRequest): ResponseEntity<ApiResponse<Any>> {
+    fun signup(@Valid @RequestBody request: MemberSignupRequest): ResponseEntity<ApiResponse<Any>> {
         authService.signup(request = request)
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(HttpStatus.CREATED))
     }
 
     @PostMapping("/login")
-    fun test(@Valid @RequestBody request: MemberLoginRequest): ResponseEntity<ApiResponse<MemberLoginResponse>> {
+    fun login(@Valid @RequestBody request: MemberLoginRequest): ResponseEntity<ApiResponse<MemberLoginResponse>> {
         val response = authService.login(request = request)
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(HttpStatus.OK, response))
     }
