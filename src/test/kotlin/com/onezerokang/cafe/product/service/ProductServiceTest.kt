@@ -9,6 +9,7 @@ import com.onezerokang.cafe.product.domain.ProductRepository
 import com.onezerokang.cafe.product.domain.ProductSize
 import com.onezerokang.cafe.product.dto.request.ProductCreateRequest
 import com.onezerokang.cafe.product.exception.BarcodeAlreadyRegisteredException
+import com.onezerokang.cafe.product.exception.ProductNotFoundException
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import org.assertj.core.api.Assertions.assertThat
@@ -107,34 +108,6 @@ class ProductServiceTest @Autowired constructor(
 
     }
 
-    private fun saveProduct(
-        name: String = "아메리카노",
-        initialName: String = "ㅇㅁㄹㅋㄴ",
-        description: String = "아이스",
-        barcode: String = "1234123412341",
-        salePrice: Int = 4000,
-        originalPrice: Int = 5000,
-        expirationDate: LocalDate = LocalDate.of(2024, 12, 31),
-        category: ProductCategory = ProductCategory.DRINK,
-        size: ProductSize = ProductSize.LARGE,
-        member: Member,
-    ) {
-        val product = Product(
-            name = name,
-            initialName = initialName,
-            description = description,
-            barcode = barcode,
-            salePrice = salePrice,
-            originalPrice = originalPrice,
-            expirationDate = expirationDate,
-            category = category,
-            size = size,
-            member = member,
-
-        )
-        productRepository.save(product)
-    }
-
     @DisplayName("등록되지 않은 회원은 상품을 등록할 수 없다.")
     @Test
     fun createProductWithUnRegisteredMember() {
@@ -156,4 +129,97 @@ class ProductServiceTest @Autowired constructor(
             .isInstanceOf(MemberNotFoundException::class.java)
             .hasMessage("Member not found")
     }
+
+    // 상품 조회
+    @DisplayName("상품 상세 내역을 조회할 수 있다.")
+    @Test
+    fun getProduct() {
+        // given
+        val member = memberRepository.save(Member(phoneNumber = "01012341234", password = "1234"))
+        val productId = saveProduct(member = member)
+
+        // when
+        val response = productService.getProduct(productId = productId, memberId = member.id!!)
+
+        //then
+        assertThat(response)
+            .extracting(
+                "name",
+                "description",
+                "barcode",
+                "salePrice",
+                "originalPrice",
+                "expirationDate",
+                "category",
+                "size"
+            )
+            .containsExactlyInAnyOrder(
+                "아메리카노",
+                "아이스",
+                "1234123412341",
+                4000,
+                5000,
+                LocalDate.of(2024, 12, 31),
+                ProductCategory.DRINK,
+                ProductSize.LARGE
+            )
+        assertThat(response.member.phoneNumber).isEqualTo("01012341234")
+    }
+
+    @DisplayName("등록되지 않은 상품 상세 내역을 조회할 수 없다.")
+    @Test
+    fun getProductByUnRegisteredProductId() {
+        // given
+        val member = memberRepository.save(Member(phoneNumber = "01012341234", password = "1234"))
+        val productId = -1L
+        // when then
+        assertThatThrownBy { productService.getProduct(productId = productId, memberId = member.id!!) }
+            .isInstanceOf(ProductNotFoundException::class.java)
+            .hasMessage("Product not found")
+    }
+
+
+    @DisplayName("다른 회원이 등록한 상품은 조회할 수 없다.")
+    @Test
+    fun getProductNotOwnedByMember() {
+        // given
+        val member = memberRepository.save(Member(phoneNumber = "01012341234", password = "1234"))
+        val productId = saveProduct(member = member)
+        val memberId = -1L
+        // when then
+        assertThatThrownBy { productService.getProduct(productId = productId, memberId = memberId) }
+            .isInstanceOf(ProductNotFoundException::class.java)
+            .hasMessage("Product not found")
+    }
+//
+
+    private fun saveProduct(
+        name: String = "아메리카노",
+        initialName: String = "ㅇㅁㄹㅋㄴ",
+        description: String = "아이스",
+        barcode: String = "1234123412341",
+        salePrice: Int = 4000,
+        originalPrice: Int = 5000,
+        expirationDate: LocalDate = LocalDate.of(2024, 12, 31),
+        category: ProductCategory = ProductCategory.DRINK,
+        size: ProductSize = ProductSize.LARGE,
+        member: Member,
+    ): Long {
+        val product = Product(
+            name = name,
+            initialName = initialName,
+            description = description,
+            barcode = barcode,
+            salePrice = salePrice,
+            originalPrice = originalPrice,
+            expirationDate = expirationDate,
+            category = category,
+            size = size,
+            member = member,
+
+            )
+        val savedProduct = productRepository.save(product)
+        return savedProduct.id!!
+    }
+
 }

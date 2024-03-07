@@ -4,7 +4,9 @@ import com.onezerokang.cafe.member.domain.MemberRepository
 import com.onezerokang.cafe.member.exception.MemberNotFoundException
 import com.onezerokang.cafe.product.domain.ProductRepository
 import com.onezerokang.cafe.product.dto.request.ProductCreateRequest
+import com.onezerokang.cafe.product.dto.response.ProductResponse
 import com.onezerokang.cafe.product.exception.BarcodeAlreadyRegisteredException
+import com.onezerokang.cafe.product.exception.ProductNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,4 +30,20 @@ class ProductService(
         val product = request.toEntity(member = member)
         productRepository.save(product)
     }
+
+    // 상품 상세 조회
+    fun getProduct(productId: Long, memberId: Long): ProductResponse {
+        val product = (productRepository.findByIdAndMemberId(productId = productId, memberId = memberId)
+            ?: throw ProductNotFoundException())
+
+        return ProductResponse.of(product = product)
+    }
+
+    // 상품 수정
+
+    // 상품 삭제
+
+    // 검색
+
+    // 페이징
 }
