@@ -1,6 +1,7 @@
 package com.onezerokang.cafe.auth.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.onezerokang.cafe.auth.dto.request.MemberLoginRequest
 import com.onezerokang.cafe.auth.dto.request.MemberSignupRequest
 import com.onezerokang.cafe.auth.service.AuthService
 import org.junit.jupiter.api.Assertions.*
@@ -62,6 +63,54 @@ class AuthControllerTest @Autowired constructor(
     fun signupWithBlankPassword() {
         val url = "/api/auth/signup"
         val request = MemberSignupRequest(phoneNumber = "01012341234", password = "")
+
+        mockMvc.perform(post(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+            .andDo(print())
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.meta.code").value(400))
+            .andExpect(jsonPath("$.meta.message").value("Bad Request"))
+            .andExpect(jsonPath("$.data").value(null))
+    }
+
+    @DisplayName("로그인을 할 수 있다.")
+    @Test
+    fun login() {
+        val url = "/api/auth/login"
+        val request = MemberLoginRequest(phoneNumber = "01012341234", password = "1234")
+
+        mockMvc.perform(post(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+            .andDo(print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.meta.code").value(200))
+            .andExpect(jsonPath("$.meta.message").value("OK"))
+            .andExpect(jsonPath("$.data").value(null))
+    }
+
+    @DisplayName("로그인 시, 전화번호는 필수다.")
+    @Test
+    fun loginWithBlankPhoneNumber() {
+        val url = "/api/auth/login"
+        val request = MemberLoginRequest(phoneNumber = "", password = "1234")
+
+        mockMvc.perform(post(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+            .andDo(print())
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.meta.code").value(400))
+            .andExpect(jsonPath("$.meta.message").value("Bad Request"))
+            .andExpect(jsonPath("$.data").value(null))
+    }
+
+    @DisplayName("회원가입 시, 비밀번호는 필수다.")
+    @Test
+    fun loginWithBlankPassword() {
+        val url = "/api/auth/login"
+        val request = MemberLoginRequest(phoneNumber = "01012341234", password = "")
 
         mockMvc.perform(post(url)
             .contentType(MediaType.APPLICATION_JSON)

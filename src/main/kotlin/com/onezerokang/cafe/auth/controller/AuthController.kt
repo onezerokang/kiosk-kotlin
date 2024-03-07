@@ -1,6 +1,8 @@
 package com.onezerokang.cafe.auth.controller
 
+import com.onezerokang.cafe.auth.dto.request.MemberLoginRequest
 import com.onezerokang.cafe.auth.dto.request.MemberSignupRequest
+import com.onezerokang.cafe.auth.dto.response.MemberLoginResponse
 import com.onezerokang.cafe.auth.service.AuthService
 import com.onezerokang.cafe.global.common.ApiResponse
 import jakarta.validation.Valid
@@ -20,5 +22,11 @@ class AuthController(
     fun test(@Valid @RequestBody request: MemberSignupRequest): ResponseEntity<ApiResponse<Any>> {
         authService.signup(request = request)
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(HttpStatus.CREATED))
+    }
+
+    @PostMapping("/login")
+    fun test(@Valid @RequestBody request: MemberLoginRequest): ResponseEntity<ApiResponse<MemberLoginResponse>> {
+        val response = authService.login(request = request)
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(HttpStatus.OK, response))
     }
 }
