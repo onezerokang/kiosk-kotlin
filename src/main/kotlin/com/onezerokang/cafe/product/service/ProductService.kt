@@ -4,6 +4,7 @@ import com.onezerokang.cafe.member.domain.MemberRepository
 import com.onezerokang.cafe.member.exception.MemberNotFoundException
 import com.onezerokang.cafe.product.domain.ProductRepository
 import com.onezerokang.cafe.product.dto.request.ProductCreateRequest
+import com.onezerokang.cafe.product.dto.request.ProductUpdateRequest
 import com.onezerokang.cafe.product.dto.response.ProductResponse
 import com.onezerokang.cafe.product.exception.BarcodeAlreadyRegisteredException
 import com.onezerokang.cafe.product.exception.ProductNotFoundException
@@ -17,6 +18,7 @@ class ProductService(
     private val productRepository: ProductRepository,
     private val memberRepository: MemberRepository,
 ) {
+    @Transactional
     fun createProduct(request: ProductCreateRequest, memberId: Long) {
         val isExist = productRepository.existsByBarcode(request.barcode)
         if (isExist) {
@@ -40,10 +42,10 @@ class ProductService(
     }
 
     // 상품 수정
-
-    // 상품 삭제
-
-    // 검색
-
-    // 페이징
+    @Transactional
+    fun updateProduct(request: ProductUpdateRequest, productId: Long, memberId: Long) {
+        val product = (productRepository.findByIdAndMemberId(productId = productId, memberId = memberId)
+            ?: throw ProductNotFoundException())
+        product.update(request)
+    }
 }

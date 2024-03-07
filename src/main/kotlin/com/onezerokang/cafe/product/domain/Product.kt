@@ -1,31 +1,33 @@
 package com.onezerokang.cafe.product.domain
 
 import com.onezerokang.cafe.global.domain.BaseEntity
+import com.onezerokang.cafe.global.util.KoreanInitialExtractor
 import com.onezerokang.cafe.member.domain.Member
+import com.onezerokang.cafe.product.dto.request.ProductUpdateRequest
 import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity
 class Product(
-    val name: String,
+    var name: String,
 
-    val initialName: String,
+    var initialName: String,
 
-    val description: String,
+    var description: String,
 
-    val barcode: String,
+    var barcode: String,
 
-    val salePrice: Int,
+    var salePrice: Int,
 
-    val originalPrice: Int,
+    var originalPrice: Int,
 
-    val expirationDate: LocalDate,
-
-    @Enumerated(EnumType.STRING)
-    val category: ProductCategory,
+    var expirationDate: LocalDate,
 
     @Enumerated(EnumType.STRING)
-    val size: ProductSize,
+    var category: ProductCategory,
+
+    @Enumerated(EnumType.STRING)
+    var size: ProductSize,
 
     @JoinColumn(name = "member_id")
     @ManyToOne
@@ -34,4 +36,33 @@ class Product(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
-) : BaseEntity()
+) : BaseEntity() {
+
+    fun update(request: ProductUpdateRequest) {
+        request.name?.let {
+            name = it
+            initialName = KoreanInitialExtractor.extract(it)
+        }
+        request.description?.let {
+            description = it
+        }
+        request.barcode?.let {
+            barcode = it
+        }
+        request.salePrice?.let {
+            salePrice = it
+        }
+        request.originalPrice?.let {
+            originalPrice = it
+        }
+        request.expirationDate?.let {
+            expirationDate = it
+        }
+        request.category?.let {
+            category = it
+        }
+        request.size?.let {
+            size = it
+        }
+    }
+}

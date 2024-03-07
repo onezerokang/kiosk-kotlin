@@ -8,6 +8,7 @@ import com.onezerokang.cafe.product.domain.ProductCategory
 import com.onezerokang.cafe.product.domain.ProductRepository
 import com.onezerokang.cafe.product.domain.ProductSize
 import com.onezerokang.cafe.product.dto.request.ProductCreateRequest
+import com.onezerokang.cafe.product.dto.request.ProductUpdateRequest
 import com.onezerokang.cafe.product.exception.BarcodeAlreadyRegisteredException
 import com.onezerokang.cafe.product.exception.ProductNotFoundException
 import jakarta.persistence.EnumType
@@ -130,7 +131,6 @@ class ProductServiceTest @Autowired constructor(
             .hasMessage("Member not found")
     }
 
-    // 상품 조회
     @DisplayName("상품 상세 내역을 조회할 수 있다.")
     @Test
     fun getProduct() {
@@ -191,7 +191,65 @@ class ProductServiceTest @Autowired constructor(
             .isInstanceOf(ProductNotFoundException::class.java)
             .hasMessage("Product not found")
     }
-//
+
+    @DisplayName("상품의 속성을 부분 수정할 수 있다.")
+    @Test
+    fun updateProduct() {
+        // given
+        val member = memberRepository.save(Member(phoneNumber = "01012341234", password = "1234"))
+        val productId = saveProduct(name = "아메리카노", size = ProductSize.SMALL, member = member)
+        val request = ProductUpdateRequest(name = "아이스 아메리카노", size = ProductSize.LARGE)
+
+        // when
+        productService.updateProduct(request = request, productId = productId, memberId = member.id!!)
+
+        //then
+        val products = productRepository.findAll()
+        assertThat(products).hasSize(1)
+            .extracting(
+                "name",
+                "initialName",
+                "description",
+                "barcode",
+                "salePrice",
+                "originalPrice",
+                "expirationDate",
+                "category",
+                "size",
+            ).containsExactlyInAnyOrder(
+                tuple(
+                    "아이스 아메리카노",
+                    "ㅇㅇㅅ ㅇㅁㄹㅋㄴ",
+                    "아이스",
+                    "1234123412341",
+                    4000,
+                    5000,
+                    LocalDate.of(2024, 12, 31),
+                    ProductCategory.DRINK,
+                    ProductSize.LARGE
+                )
+            )
+        assertThat(products[0].member).isEqualTo(member)
+    }
+
+    @DisplayName("등록되지 않은 상품을 수정할 수 없다.")
+    @Test
+    fun updateUnRegisteredProduct() {
+        val memberId = -1L
+        val productId = -1L
+        val request = ProductUpdateRequest(name = "아이스 아메리카노", size = ProductSize.LARGE)
+
+        // when then
+        assertThatThrownBy {
+            productService.updateProduct(
+                request = request,
+                memberId = memberId,
+                productId = productId
+            )
+        }
+            .isInstanceOf(ProductNotFoundException::class.java)
+            .hasMessage("Product not found")
+    }
 
     private fun saveProduct(
         name: String = "아메리카노",
