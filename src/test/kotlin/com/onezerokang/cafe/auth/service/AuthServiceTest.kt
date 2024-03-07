@@ -1,7 +1,9 @@
 package com.onezerokang.cafe.auth.service
 
+import com.onezerokang.cafe.auth.dto.request.MemberLoginRequest
 import com.onezerokang.cafe.auth.dto.request.MemberSignupRequest
 import com.onezerokang.cafe.auth.exception.PhoneNumberAlreadyRegisteredException
+import com.onezerokang.cafe.auth.exception.UnAuthenticationException
 import com.onezerokang.cafe.member.domain.Member
 import com.onezerokang.cafe.member.domain.MemberRepository
 import org.assertj.core.api.Assertions.*
@@ -43,13 +45,62 @@ class AuthServiceTest @Autowired constructor(
     @Test
     fun signupWithAlreadyRegisteredPhoneNumber() {
         // given
-        val request = MemberSignupRequest(phoneNumber = "이상혁", password = "1234")
-        val member = Member(phoneNumber = "이상혁", password = "1234")
+        val request = MemberSignupRequest(phoneNumber = "01012341234", password = "1234")
+        val member = Member(phoneNumber = "01012341234", password = "1234")
         memberRepository.save(member)
 
         // when then
         assertThatThrownBy { authService.signup(request) }
             .isInstanceOf(PhoneNumberAlreadyRegisteredException::class.java)
             .hasMessage("The phone number is already registered")
+    }
+
+    @DisplayName("회원은 로그인 할 수 있다.")
+    @Test
+    fun login() {
+        // given
+        val request = MemberLoginRequest(phoneNumber = "01012341234", password = "1234")
+        saveMember(phoneNumber = "01012341234", password = "1234")
+
+        // when
+        val response = authService.login(request)
+
+        //then
+        assertThat(response.accessToken).isNotBlank()
+    }
+
+    @DisplayName("등록되지 않은 휴대폰 번호로 로그인 시, 로그인에 실패한다.")
+    @Test
+    fun loginWithUnRegisteredPhoneNumber() {
+        // given
+        val request = MemberLoginRequest(phoneNumber = "01099999999", password = "1234")
+        saveMember(phoneNumber = "01012341234", password = "1234")
+
+        // when then
+        assertThatThrownBy { authService.login(request) }
+            .isInstanceOf(UnAuthenticationException::class.java)
+            .hasMessage("Authentication failed")
+
+    }
+
+    @DisplayName("비밀번호가 일치하지 않을 시, 로그인에 실패한다.")
+    @Test
+    fun loginWithMissMatchedPassword() {
+        // given
+        val request = MemberLoginRequest(phoneNumber = "01012341234", password = "9999")
+        saveMember(phoneNumber = "01012341234", password = "1234")
+
+        // when then
+        assertThatThrownBy { authService.login(request) }
+            .isInstanceOf(UnAuthenticationException::class.java)
+            .hasMessage("Authentication failed")
+    }
+
+    private fun saveMember(phoneNumber: String, password: String) {
+        val member = Member(
+            phoneNumber = phoneNumber,
+            password = passwordEncoder.encode(password)
+        )
+        memberRepository.save(member)
     }
 }

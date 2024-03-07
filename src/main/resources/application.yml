@@ -1,3 +1,6 @@
 spring:
   profiles:
     default: local
+jwt:
+  secret:
+    MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDEDbh+6LBGVZz34H+uYtjojfjja/rCFEQ95fGXQmb72rmoqFQLHEVXQ2VTV+3Qsyd8vtRWEff5AHwb
