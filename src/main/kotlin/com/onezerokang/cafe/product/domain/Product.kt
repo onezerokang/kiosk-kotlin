@@ -1,12 +1,15 @@
 package com.onezerokang.cafe.product.domain
 
 import com.onezerokang.cafe.global.domain.BaseEntity
+import com.onezerokang.cafe.member.domain.Member
 import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity
 class Product(
     val name: String,
+
+    val initialName: String,
 
     val description: String,
 
@@ -23,6 +26,10 @@ class Product(
 
     @Enumerated(EnumType.STRING)
     val size: ProductSize,
+
+    @JoinColumn(name = "member_id")
+    @ManyToOne
+    val member: Member,
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
