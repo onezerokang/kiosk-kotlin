@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -62,6 +63,25 @@ class ProductControllerTest @Autowired constructor(
             .andExpect(status().isCreated)
             .andExpect(jsonPath("$.meta.code").value(201))
             .andExpect(jsonPath("$.meta.message").value("Created"))
+            .andExpect(jsonPath("$.data").value(null))
+    }
+
+    @DisplayName("상품 상세 내역을 조회할 수 있다.")
+    @Test
+    fun getProduct() {
+        // given
+        val url = "/api/products/1"
+        given(jwtUtil.validateToken(anyString())).willReturn(true)
+        given(jwtUtil.extractSubject(anyString())).willReturn("1")
+        given(memberRepository.existsById(anyLong())).willReturn(true)
+
+        // when then
+        mockMvc.perform(get(url)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken"))
+            .andDo(print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.meta.code").value(200))
+            .andExpect(jsonPath("$.meta.message").value("OK"))
             .andExpect(jsonPath("$.data").value(null))
     }
 
