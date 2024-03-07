@@ -1,6 +1,7 @@
 package com.onezerokang.cafe.product.domain
 
 import com.onezerokang.cafe.global.domain.BaseEntity
+import com.onezerokang.cafe.global.error.exception.BadRequestException
 import com.onezerokang.cafe.global.util.KoreanInitialExtractor
 import com.onezerokang.cafe.member.domain.Member
 import com.onezerokang.cafe.product.dto.request.ProductUpdateRequest
@@ -40,23 +41,40 @@ class Product(
 
     fun update(request: ProductUpdateRequest) {
         request.name?.let {
+            if (it.isBlank()) {
+                throw BadRequestException(message = "name must not be blank")
+            }
             name = it
             initialName = KoreanInitialExtractor.extract(it)
         }
         request.description?.let {
+            if (it.isBlank()) {
+                throw BadRequestException(message = "description must not be blank")
+            }
             description = it
         }
         request.barcode?.let {
+            if (it.isBlank()) {
+                throw BadRequestException(message = "barcode must not be blank")
+            }
             barcode = it
         }
         request.salePrice?.let {
+            if (it <= 0) {
+                throw BadRequestException(message = "salePrice must be positive")
+            }
             salePrice = it
         }
         request.originalPrice?.let {
+            if (it <= 0) {
+                throw BadRequestException(message = "originalPrice must be positive")
+            }
             originalPrice = it
         }
         request.expirationDate?.let {
-            expirationDate = it
+            if (it.isBefore(LocalDate.now())) {
+                throw BadRequestException(message = "expirationDate must be present or future date")
+            }
         }
         request.category?.let {
             category = it
