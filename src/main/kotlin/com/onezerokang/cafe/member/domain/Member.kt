@@ -1,6 +1,5 @@
 package com.onezerokang.cafe.member.domain
 
-import com.onezerokang.cafe.auth.dto.request.MemberSignupRequest
 import com.onezerokang.cafe.global.domain.BaseEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -15,10 +14,4 @@ class Member(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-): BaseEntity() {
-    companion object {
-        fun create(request: MemberSignupRequest) {
-            Member(phoneNumber = request.phoneNumber, password = request.password)
-        }
-    }
-}
+): BaseEntity()
