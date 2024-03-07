@@ -6,6 +6,7 @@ import com.onezerokang.cafe.member.domain.MemberRepository
 import com.onezerokang.cafe.product.domain.ProductCategory
 import com.onezerokang.cafe.product.domain.ProductSize
 import com.onezerokang.cafe.product.dto.request.ProductCreateRequest
+import com.onezerokang.cafe.product.dto.request.ProductUpdateRequest
 import com.onezerokang.cafe.product.service.ProductService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
@@ -17,8 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -78,6 +78,29 @@ class ProductControllerTest @Autowired constructor(
         // when then
         mockMvc.perform(get(url)
             .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken"))
+            .andDo(print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.meta.code").value(200))
+            .andExpect(jsonPath("$.meta.message").value("OK"))
+            .andExpect(jsonPath("$.data").value(null))
+    }
+
+    @DisplayName("상품 속성을 수정할 수 있다.")
+    @Test
+    fun updateProduct() {
+        // given
+        val url = "/api/products/1"
+        val request = ProductUpdateRequest(name = "소금빵(기한 한정 세일)", salePrice = 3000)
+
+        given(jwtUtil.validateToken(anyString())).willReturn(true)
+        given(jwtUtil.extractSubject(anyString())).willReturn("1")
+        given(memberRepository.existsById(anyLong())).willReturn(true)
+
+        // when then
+        mockMvc.perform(patch(url)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
             .andDo(print())
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.meta.code").value(200))
