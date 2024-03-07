@@ -30,6 +30,9 @@ class Product(
     @Enumerated(EnumType.STRING)
     var size: ProductSize,
 
+    @Enumerated(EnumType.STRING)
+    var status: ProductStatus,
+
     @JoinColumn(name = "member_id")
     @ManyToOne
     val member: Member,
