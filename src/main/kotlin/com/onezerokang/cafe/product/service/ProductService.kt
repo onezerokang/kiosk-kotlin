@@ -8,6 +8,7 @@ import com.onezerokang.cafe.product.dto.request.ProductUpdateRequest
 import com.onezerokang.cafe.product.dto.response.ProductResponse
 import com.onezerokang.cafe.product.exception.BarcodeAlreadyRegisteredException
 import com.onezerokang.cafe.product.exception.ProductNotFoundException
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -55,5 +56,17 @@ class ProductService(
             ?: throw ProductNotFoundException()
 
         product.delete()
+    }
+
+    fun getProductsByPage(lastId: Long, memberId: Long, size: Int): List<ProductResponse> {
+        // n + 1 쿼리?
+        val pageRequest = PageRequest.of(0, size)
+        val productsPage =
+            productRepository.findByIdGreaterThanAndMemberIdOrderByIdAsc(
+                id = lastId,
+                memberId = memberId,
+                pageable = pageRequest
+            )
+        return productsPage.map { ProductResponse.of(it) }
     }
 }

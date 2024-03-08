@@ -284,6 +284,30 @@ class ProductServiceTest @Autowired constructor(
             .isInstanceOf(ProductNotFoundException::class.java)
             .hasMessage("Product not found")
     }
+    
+    @DisplayName("상품 목록을 조회할 수 있다.")
+    @Test
+    fun getProductsByPage() {
+        // given
+        val member = memberRepository.save(Member(phoneNumber = "01012341234", password = "1234"))
+        val lastId = saveProduct(name = "아메리카노", member = member)
+        saveProduct(name = "카푸치노", member = member)
+        saveProduct(name = "소금빵", member = member)
+        saveProduct(name = "밤양갱", member = member)
+        saveProduct(name = "롤케이크", member = member)
+
+        // when
+        val pages = productService.getProductsByPage(lastId = lastId, memberId = member.id!!, size = 3)
+
+        //then
+        assertThat(pages).hasSize(3)
+            .extracting("name")
+            .containsExactlyInAnyOrder(
+                "카푸치노",
+                "소금빵",
+                "밤양갱",
+            )
+    }
 
     private fun saveProduct(
         name: String = "아메리카노",
