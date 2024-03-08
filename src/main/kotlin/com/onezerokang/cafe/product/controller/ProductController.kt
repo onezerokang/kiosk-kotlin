@@ -7,6 +7,7 @@ import com.onezerokang.cafe.product.dto.request.ProductUpdateRequest
 import com.onezerokang.cafe.product.dto.response.ProductResponse
 import com.onezerokang.cafe.product.service.ProductService
 import jakarta.validation.Valid
+import jakarta.websocket.server.PathParam
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -30,6 +31,16 @@ class ProductController(
     ): ResponseEntity<ApiResponse<Any>> {
         productService.createProduct(request, memberId)
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(status = HttpStatus.CREATED))
+    }
+
+    @GetMapping
+    fun getProductsByPage(
+        @PathParam("lastId") lastId: Long,
+        @PathParam("size") size: Int? = 10,
+        @AuthMember memberId: Long,
+    ): ResponseEntity<ApiResponse<Any>> {
+        val productPages = productService.getProductsByPage(lastId = lastId, memberId = memberId, size = size!!)
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(status = HttpStatus.OK, data = productPages))
     }
 
     @GetMapping("/{productId}")
