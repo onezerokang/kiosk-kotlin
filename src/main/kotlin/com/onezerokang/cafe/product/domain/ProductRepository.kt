@@ -11,6 +11,8 @@ interface ProductRepository:JpaRepository<Product, Long> {
 
     fun findByIdGreaterThanAndMemberIdOrderByIdAsc(id: Long, memberId: Long, pageable: Pageable): List<Product>
 
+    fun findByMemberIdAndInitialNameContaining(memberId: Long, initialName: String): List<Product>
+
     @Query("SELECT p.* FROM product p", nativeQuery = true)
     fun findAllIncludingDeleted(): List<Product>
 }

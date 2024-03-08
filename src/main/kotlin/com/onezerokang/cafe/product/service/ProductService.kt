@@ -1,5 +1,6 @@
 package com.onezerokang.cafe.product.service
 
+import com.onezerokang.cafe.global.util.KoreanInitialExtractor
 import com.onezerokang.cafe.member.domain.MemberRepository
 import com.onezerokang.cafe.member.exception.MemberNotFoundException
 import com.onezerokang.cafe.product.domain.ProductRepository
@@ -68,5 +69,16 @@ class ProductService(
                 pageable = pageRequest
             )
         return productsPage.map { ProductResponse.of(it) }
+    }
+
+    fun searchProduct(memberId: Long, keyword: String): List<ProductResponse> {
+        val initialName = KoreanInitialExtractor.extract(keyword)
+
+        val products = productRepository.findByMemberIdAndInitialNameContaining(
+            memberId = memberId,
+            initialName = initialName,
+        )
+
+        return products.map { ProductResponse.of(it) }
     }
 }

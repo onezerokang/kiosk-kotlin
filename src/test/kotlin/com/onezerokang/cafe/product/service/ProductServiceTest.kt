@@ -309,6 +309,42 @@ class ProductServiceTest @Autowired constructor(
             )
     }
 
+    @DisplayName("상품을 검색할 수 있다.")
+    @Test
+    fun searchProduct() {
+        // given
+        val member = memberRepository.save(Member(phoneNumber = "01012341234", password = "1234"))
+        saveProduct(name = "아이스 아메리카노", initialName = "ㅇㅇㅅ ㅇㅁㄹㅋㄴ", member = member)
+        saveProduct(name = "아메리카노", initialName = "ㅇㅁㄹㅋㄴ", member = member)
+        saveProduct(name = "수제쿠키", initialName = "ㅅㅈㅋㅋ", member = member)
+
+        // when
+        val products = productService.searchProduct(memberId = member.id!!, keyword = "아메리카노")
+
+        //then
+        assertThat(products).hasSize(2)
+            .extracting("name")
+            .containsExactlyInAnyOrder("아이스 아메리카노", "아메리카노")
+    }
+
+    @DisplayName("상품 초성으로 검색할 수 있다.")
+    @Test
+    fun searchProductWithKoreanInitial() {
+        // given
+        val member = memberRepository.save(Member(phoneNumber = "01012341234", password = "1234"))
+        saveProduct(name = "아이스 아메리카노", initialName = "ㅇㅇㅅ ㅇㅁㄹㅋㄴ", member = member)
+        saveProduct(name = "아메리카노", initialName = "ㅇㅁㄹㅋㄴ", member = member)
+        saveProduct(name = "수제쿠키", initialName = "ㅅㅈㅋㅋ", member = member)
+
+        // when
+        val products = productService.searchProduct(memberId = member.id!!, keyword = "ㅇㅁㄹㅋㄴ")
+
+        //then
+        assertThat(products).hasSize(2)
+            .extracting("name")
+            .containsExactlyInAnyOrder("아이스 아메리카노", "아메리카노")
+    }
+
     private fun saveProduct(
         name: String = "아메리카노",
         initialName: String = "ㅇㅁㄹㅋㄴ",
