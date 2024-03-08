@@ -55,10 +55,12 @@ class ProductControllerTest @Autowired constructor(
         given(memberRepository.existsById(anyLong())).willReturn(true)
 
         // when then
-        mockMvc.perform(post(url)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+            post(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
             .andDo(print())
             .andExpect(status().isCreated)
             .andExpect(jsonPath("$.meta.code").value(201))
@@ -76,8 +78,10 @@ class ProductControllerTest @Autowired constructor(
         given(memberRepository.existsById(anyLong())).willReturn(true)
 
         // when then
-        mockMvc.perform(get(url)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken"))
+        mockMvc.perform(
+            get(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken")
+        )
             .andDo(print())
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.meta.code").value(200))
@@ -97,10 +101,33 @@ class ProductControllerTest @Autowired constructor(
         given(memberRepository.existsById(anyLong())).willReturn(true)
 
         // when then
-        mockMvc.perform(patch(url)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+            patch(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .andDo(print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.meta.code").value(200))
+            .andExpect(jsonPath("$.meta.message").value("OK"))
+            .andExpect(jsonPath("$.data").value(null))
+    }
+
+    @DisplayName("상품을 삭제할 수 있다.")
+    @Test
+    fun deleteProduct() {
+        // given
+        val url = "/api/products/1"
+        given(jwtUtil.validateToken(anyString())).willReturn(true)
+        given(jwtUtil.extractSubject(anyString())).willReturn("1")
+        given(memberRepository.existsById(anyLong())).willReturn(true)
+
+        // when then
+        mockMvc.perform(
+            delete(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken")
+        )
             .andDo(print())
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.meta.code").value(200))
