@@ -6,8 +6,10 @@ import com.onezerokang.cafe.global.util.KoreanInitialExtractor
 import com.onezerokang.cafe.member.domain.Member
 import com.onezerokang.cafe.product.dto.request.ProductUpdateRequest
 import jakarta.persistence.*
+import org.hibernate.annotations.*
 import java.time.LocalDate
 
+@SQLRestriction("status NOT IN ('DELETED')")
 @Entity
 class Product(
     var name: String,
@@ -31,7 +33,7 @@ class Product(
     var size: ProductSize,
 
     @Enumerated(EnumType.STRING)
-    var status: ProductStatus,
+    var status: ProductStatus = ProductStatus.SELLING,
 
     @JoinColumn(name = "member_id")
     @ManyToOne
@@ -85,5 +87,9 @@ class Product(
         request.size?.let {
             size = it
         }
+    }
+
+    fun delete() {
+        status = ProductStatus.DELETED
     }
 }

@@ -3,10 +3,7 @@ package com.onezerokang.cafe.product.service
 import com.onezerokang.cafe.member.domain.Member
 import com.onezerokang.cafe.member.domain.MemberRepository
 import com.onezerokang.cafe.member.exception.MemberNotFoundException
-import com.onezerokang.cafe.product.domain.Product
-import com.onezerokang.cafe.product.domain.ProductCategory
-import com.onezerokang.cafe.product.domain.ProductRepository
-import com.onezerokang.cafe.product.domain.ProductSize
+import com.onezerokang.cafe.product.domain.*
 import com.onezerokang.cafe.product.dto.request.ProductCreateRequest
 import com.onezerokang.cafe.product.dto.request.ProductUpdateRequest
 import com.onezerokang.cafe.product.exception.BarcodeAlreadyRegisteredException
@@ -251,6 +248,43 @@ class ProductServiceTest @Autowired constructor(
             .hasMessage("Product not found")
     }
 
+    @DisplayName("상품을 삭제할 수 있다.")
+    @Test
+    fun deleteProduct() {
+        // given
+        val member = memberRepository.save(Member(phoneNumber = "01012341234", password = "1234"))
+        val productId = saveProduct(name = "아메리카노", size = ProductSize.SMALL, member = member)
+        val request = ProductUpdateRequest(name = "아이스 아메리카노", size = ProductSize.LARGE)
+
+        // when
+        productService.deleteProduct(productId = productId, memberId = member.id!!)
+
+        //then
+        val products1 = productRepository.findAll()
+        val products2 = productRepository.findAllIncludingDeleted()
+        assertThat(products1).isEmpty()
+        assertThat(products2).hasSize(1)
+            .extracting("status")
+            .containsExactlyInAnyOrder(ProductStatus.DELETED)
+    }
+
+    @DisplayName("등록되지 않은 상품을 삭제할 수 없다.")
+    @Test
+    fun deleteUnRegisteredProduct() {
+        val memberId = -1L
+        val productId = -1L
+
+        // when then
+        assertThatThrownBy {
+            productService.deleteProduct(
+                memberId = memberId,
+                productId = productId
+            )
+        }
+            .isInstanceOf(ProductNotFoundException::class.java)
+            .hasMessage("Product not found")
+    }
+
     private fun saveProduct(
         name: String = "아메리카노",
         initialName: String = "ㅇㅁㄹㅋㄴ",
@@ -274,8 +308,8 @@ class ProductServiceTest @Autowired constructor(
             category = category,
             size = size,
             member = member,
-
-            )
+            status = ProductStatus.SELLING
+        )
         val savedProduct = productRepository.save(product)
         return savedProduct.id!!
     }

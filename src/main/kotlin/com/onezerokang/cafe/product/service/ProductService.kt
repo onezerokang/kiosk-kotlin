@@ -44,8 +44,16 @@ class ProductService(
     // 상품 수정
     @Transactional
     fun updateProduct(request: ProductUpdateRequest, productId: Long, memberId: Long) {
-        val product = (productRepository.findByIdAndMemberId(productId = productId, memberId = memberId)
-            ?: throw ProductNotFoundException())
+        val product = productRepository.findByIdAndMemberId(productId = productId, memberId = memberId)
+            ?: throw ProductNotFoundException()
         product.update(request)
+    }
+
+    @Transactional
+    fun deleteProduct(productId: Long, memberId: Long) {
+        val product = productRepository.findByIdAndMemberId(productId = productId, memberId = memberId)
+            ?: throw ProductNotFoundException()
+
+        product.delete()
     }
 }
