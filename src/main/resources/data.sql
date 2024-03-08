@@ -4,6 +4,9 @@ insert into product(name, initial_name, description, barcode, sale_price, origin
 value('아메리카노', 'ㅇㅁㄹㅋㄴ', '아이스', '1234', 4000, 5000, '2024-12-31', 'DRINK', 'LARGE', 'SELLING', 1);
 
 insert into product(name, initial_name, description, barcode, sale_price, original_price, expiration_date, category, size, status, member_id)
+value('아이스 아메리카노', 'ㅇㅅㅇ ㅇㅁㄹㅋㄴ', '아이스', '1234', 4000, 5000, '2024-12-31', 'DRINK', 'LARGE', 'SELLING', 1);
+
+insert into product(name, initial_name, description, barcode, sale_price, original_price, expiration_date, category, size, status, member_id)
 value('카푸치노', 'ㅋㅍㅊㄴ', '아이스', '1234', 4000, 5000, '2024-12-31', 'DRINK', 'LARGE', 'SELLING', 1);
 
 insert into product(name, initial_name, description, barcode, sale_price, original_price, expiration_date, category, size, status, member_id)
