@@ -40,7 +40,18 @@ class ProductController(
         @AuthMember memberId: Long,
     ): ResponseEntity<ApiResponse<Any>> {
         val productPages = productService.getProductsByPage(lastId = lastId, memberId = memberId, size = size!!)
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(status = HttpStatus.OK, data = productPages))
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success(status = HttpStatus.OK, data = productPages))
+    }
+
+    @GetMapping("/search")
+    fun getProductsByPage(
+        @PathParam("keyword") keyword: String,
+        @AuthMember memberId: Long,
+    ): ResponseEntity<ApiResponse<Any>> {
+        val products = productService.searchProduct(memberId = memberId, keyword = keyword)
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success(status = HttpStatus.OK, data = products))
     }
 
     @GetMapping("/{productId}")
@@ -57,7 +68,7 @@ class ProductController(
         @PathVariable("productId") productId: Long,
         @AuthMember memberId: Long,
         @Valid @RequestBody request: ProductUpdateRequest
-    ):ResponseEntity<ApiResponse<Any>> {
+    ): ResponseEntity<ApiResponse<Any>> {
         productService.updateProduct(request = request, productId = productId, memberId = memberId)
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(status = HttpStatus.OK))
     }

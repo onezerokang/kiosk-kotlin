@@ -158,4 +158,26 @@ class ProductControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.data").isEmpty())
     }
 
+    @DisplayName("상품을 검색할 수 있다.")
+    @Test
+    fun searchProduct() {
+        // given
+        val url = "/api/products/search"
+        given(jwtUtil.validateToken(anyString())).willReturn(true)
+        given(jwtUtil.extractSubject(anyString())).willReturn("1")
+        given(memberRepository.existsById(anyLong())).willReturn(true)
+
+        // when then
+        mockMvc.perform(
+            get(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken")
+                .queryParam("keyword", "아메리카노")
+        )
+            .andDo(print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.meta.code").value(200))
+            .andExpect(jsonPath("$.meta.message").value("OK"))
+            .andExpect(jsonPath("$.data").isEmpty())
+    }
+
 }
