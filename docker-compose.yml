@@ -1,5 +1,18 @@
 version: '3.8'
 services:
+  app:
+    container_name: "cafe_app"
+    build: .
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://cafe-mysql:3306/cafe
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: 1234
+    depends_on:
+      mysql:
+        condition: service_healthy
   mysql:
     image: mysql:5.7
     platform: linux/amd64
@@ -16,6 +29,10 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost", "-p1234" ]
+      interval: 3s
+      timeout: 20s
   redis:
     image: redis
     restart: on-failure
