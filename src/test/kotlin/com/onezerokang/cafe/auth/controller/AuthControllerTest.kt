@@ -61,7 +61,7 @@ class AuthControllerTest @Autowired constructor(
             .andDo(print())
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.meta.code").value(400))
-            .andExpect(jsonPath("$.meta.message").value("Bad Request"))
+            .andExpect(jsonPath("$.meta.message").value("phoneNumber : must not be blank"))
             .andExpect(jsonPath("$.data").value(null))
     }
 
@@ -77,7 +77,7 @@ class AuthControllerTest @Autowired constructor(
             .andDo(print())
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.meta.code").value(400))
-            .andExpect(jsonPath("$.meta.message").value("Bad Request"))
+            .andExpect(jsonPath("$.meta.message").value("password : must not be blank"))
             .andExpect(jsonPath("$.data").value(null))
     }
 
@@ -109,7 +109,7 @@ class AuthControllerTest @Autowired constructor(
             .andDo(print())
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.meta.code").value(400))
-            .andExpect(jsonPath("$.meta.message").value("Bad Request"))
+            .andExpect(jsonPath("$.meta.message").value("phoneNumber : must not be blank"))
             .andExpect(jsonPath("$.data").value(null))
     }
 
@@ -125,7 +125,7 @@ class AuthControllerTest @Autowired constructor(
             .andDo(print())
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.meta.code").value(400))
-            .andExpect(jsonPath("$.meta.message").value("Bad Request"))
+            .andExpect(jsonPath("$.meta.message").value("password : must not be blank"))
             .andExpect(jsonPath("$.data").value(null))
     }
 }

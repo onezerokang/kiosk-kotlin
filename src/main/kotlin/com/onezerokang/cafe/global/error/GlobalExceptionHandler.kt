@@ -37,7 +37,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ApiResponse<Any>> {
         log.info("MethodArgumentNotValidException: $e")
-        val message = e.bindingResult.fieldErrors.joinToString(",") { "$it -> ${it.defaultMessage}" }
+        val message = e.bindingResult.fieldErrors.joinToString(",") { "${it.field} : ${it.defaultMessage}" }
         val ex = BadRequestException(message = message)
         return ResponseEntity.status(ex.status).body(ApiResponse.error(ex))
     }

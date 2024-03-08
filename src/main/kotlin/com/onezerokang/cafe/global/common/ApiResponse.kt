@@ -24,7 +24,7 @@ data class ApiResponse<T>(
 
         fun error(e: ApiException): ApiResponse<Any> {
             return ApiResponse(
-                meta = Meta.of(e.status),
+                meta = Meta.of(e),
                 data = null,
             )
         }
@@ -38,6 +38,10 @@ data class Meta(
     companion object {
         fun of(status: HttpStatus): Meta {
             return Meta(status.value(), status.reasonPhrase)
+        }
+
+        fun of(e: ApiException): Meta {
+            return Meta(e.status.value(), e.message)
         }
     }
 }
