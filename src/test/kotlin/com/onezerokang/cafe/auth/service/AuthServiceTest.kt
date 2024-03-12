@@ -1,5 +1,6 @@
 package com.onezerokang.cafe.auth.service
 
+import com.onezerokang.cafe.IntegrationTest
 import com.onezerokang.cafe.auth.dto.request.MemberLoginRequest
 import com.onezerokang.cafe.auth.dto.request.MemberSignupRequest
 import com.onezerokang.cafe.auth.exception.PhoneNumberAlreadyRegisteredException
@@ -11,19 +12,13 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.annotation.Transactional
 
-@ActiveProfiles("test")
-@Transactional
-@SpringBootTest
 class AuthServiceTest @Autowired constructor(
     private val authService: AuthService,
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder,
-) {
+): IntegrationTest() {
     @DisplayName("회원가입에 성공할 경우, 비밀번호는 암호화 된다.")
     @Test
     fun signup() {

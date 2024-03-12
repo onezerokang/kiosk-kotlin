@@ -1,5 +1,6 @@
 package com.onezerokang.cafe.product.service
 
+import com.onezerokang.cafe.IntegrationTest
 import com.onezerokang.cafe.member.domain.Member
 import com.onezerokang.cafe.member.domain.MemberRepository
 import com.onezerokang.cafe.member.exception.MemberNotFoundException
@@ -8,29 +9,20 @@ import com.onezerokang.cafe.product.dto.request.ProductCreateRequest
 import com.onezerokang.cafe.product.dto.request.ProductUpdateRequest
 import com.onezerokang.cafe.product.exception.BarcodeAlreadyRegisteredException
 import com.onezerokang.cafe.product.exception.ProductNotFoundException
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.assertj.core.groups.Tuple
 import org.assertj.core.groups.Tuple.tuple
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
-@ActiveProfiles("test")
-@Transactional
-@SpringBootTest
 class ProductServiceTest @Autowired constructor(
     private val productService: ProductService,
     private val productRepository: ProductRepository,
     private val memberRepository: MemberRepository,
-) {
+): IntegrationTest() {
 
     @DisplayName("상품 등록에 성공할 경우, 상품 초성도 함께 등록된다.")
     @Test
